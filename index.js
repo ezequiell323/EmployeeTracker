@@ -28,24 +28,32 @@ connection.connect(function(err){
 
 });
 console.table([
-    {
-        Employee_ID: 0 ,FIRST_NAME: "Raul",LAST_NAME: "Nino",Role_ID: 24, Manager_ID:1
-    }
-]);
-//Start with options
+        {
+            Employee_ID: 0 ,FIRST_NAME: "Jayson",LAST_NAME: "Espada",Role_ID: 14, Manager_ID:1,
+            
+        }
+    ]);console.table([
+            {
+                Employee_ID: 0 ,FIRST_NAME: "Jayson",LAST_NAME: "Espada",Role_ID: 24, Manager_ID:1,
+                Employee_ID: 1 ,FIRST_NAME: "Yuly",LAST_NAME: "Cifuentes",Role_ID: 24, Manager_ID:1,
+                Employee_ID:1 ,FIRST_NAME: "Jacob",LAST_NAME: "Espinosa",Role_ID: 24, Manager_ID:5,
+                
+            }
+        ]);
+
 function startQuestions(){
     inquire.prompt([{
         type:"list",
         name:"option",
         message:"What would like to do?",
-        choices:["Add a Department, Role or Employee?","View Department, Roles, or Employee?","Update Employee Role?"]
+        choices:["Add a Employee?","View Employee Chart?","Update Employee Role?"]
     }]).then((answer)=>{
-        if (answer.option === "Add a Department, Role or Employee?") {
+        if (answer.option === "Add a Employee?") {
             addInformation();
             }
     })
 }
-// Selecting where to add to
+
 function addInformation (){
     inquire.prompt([{
         type:"list",
@@ -58,28 +66,28 @@ function addInformation (){
             }
     })
 }
-//get information for adding employee
+
 function addEmployee(){
     inquire.prompt([
         {
-            name: "empFirst",
+            name: "firstName",
             type: "input",
-            message: "What is your First Name?"
+            message: "Employee First Name"
         },
         {
-            name: "empLast",
+            name: "lastname",
             type: "input",
-            message: "What is your Last Name?"
+            message: "Employee Last Name?"
         },
         {
-            name: "empRole",
+            name: "role",
             type: "input",
-            message: "What is your Role ID?"
+            message: "Employee Role ID?"
         },
         {
-            name: "managerID",
+            name: "mgrID",
             type: "input",
-            message: "What is your Manager's ID?",
+            message: " Manager's ID?",
             validate: function(value) {
                 if (isNaN(value) === false) {
                   return true;
@@ -93,10 +101,10 @@ function addEmployee(){
     connection.query (
         "INSERT INTO EMPLOYEE(FIRST_NAME,LAST_NAME,ROLE_ID,MANAGER_ID)VALUES (?)",
         {
-            FIRST_NAME: answer.empFirst,
-            LAST_NAME: answer.empLast,
-            ROLE_ID: parseInt(answer.empRole) || 0,
-            MANAGER_ID: parseInt(answer.managerID) || 0
+            FIRST_NAME: answer.firstName,
+            LAST_NAME: answer.lastname,
+            ROLE_ID: parseInt(answer.role) || 0,
+            MANAGER_ID: parseInt(answer.mgrID) || 0
         },
         function (err){
             if (err) throw err;
@@ -107,6 +115,3 @@ function addEmployee(){
     );
     });
 }
-/*results.forEach((EMPLOYEE,index)=>{
-    console.log(`ID: ${EMPLOYEE.ID} : ${EMPLOYEE.FIRST_NAME}, ${EMPLOYEE.LAST_NAME}| ${EMPLOYEE.ROLE_ID} |${EMPLOYEE.MANAGER_ID}`);
-})*/
