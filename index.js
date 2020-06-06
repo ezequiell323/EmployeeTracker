@@ -1,55 +1,112 @@
 
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql=require("mysql");
+const inquire=require("inquirer");
+const console_table=require("console.table");
 
-
-
-var connection = mysql.createConnection({
-  host: "localhost",
-  port: 8889,
-  user: "root",
-  password: "root",
-  database: "EMPLOYEE_TRACKER"
+const connection=mysql.createConnection({
+    host:"localhost",
+    port:8889,
+    user:"root",
+    password:"root",
+    database:"EMPLOYEE_TRACKER_DB"
 });
+
 connection.connect(function(err){
-  if(err) {
-      console.log(err);
-  } else {
+    if(err) {
+        console.log(err);
+    } else {
 
-      connection.query(`SELECT * FROM EMPLOYEE_TRACKER.EMPLOYEE;`,function(error,results) {
-          if(error) {
-              console.log(error);
-          } else {
-              results.forEach((EMPLOYEE_TRACKER,index)=>{
-                  console.log(`ID: ${EMPLOYEE_TRACKER.ID} First Name: ${EMPLOYEE_TRACKER.FIRST_NAME},Last Name: ${EMPLOYEE_TRACKER.LAST_NAME}|Role ID: ${EMPLOYEE_TRACKER.ROLE_ID} |Manager ID:${EMPLOYEE_TRACKER.MANAGER_ID}`);
-              
-                })
-          } 
-      })
-  }
+        connection.query(`SELECT * FROM EMPLOYEE_TRACKER_DB.EMPLOYEE;`,function(error,results) {
+            if(error) {
+                console.log(error);
+            } else {
+              console.log("Welcome to the Employee Tracker Database") 
+                startQuestions();
+            }
+        })
+    }
 
 });
-
-start()
-
-
-function start() {
-    inquirer
-      .prompt({
-        name: "employeelist",
-        type: "list",
-        message: "Would you like to add  employee?",
-        choices: ["Employee", "Manager",]
-      })
-      .then(function(answer) {
-        // based on their answer, either call the bid or the post functions
-        if (answer.postOrBid === "Employee") {
-          postAuction();
-        }
-        else if(answer.postOrBid === "Manager") {
-          bidAuction();
-        } else{
-          connection.end();
-        }
-      });
-  }
+console.table([
+    {
+        Employee_ID: 0 ,FIRST_NAME: "Raul",LAST_NAME: "Nino",Role_ID: 24, Manager_ID:1
+    }
+]);
+//Start with options
+function startQuestions(){
+    inquire.prompt([{
+        type:"list",
+        name:"option",
+        message:"What would like to do?",
+        choices:["Add a Department, Role or Employee?","View Department, Roles, or Employee?","Update Employee Role?"]
+    }]).then((answer)=>{
+        if (answer.option === "Add a Department, Role or Employee?") {
+            addInformation();
+            }
+    })
+}
+// Selecting where to add to
+function addInformation (){
+    inquire.prompt([{
+        type:"list",
+        name:"option",
+        message:"What inforamiton do you want to ADD to ?",
+        choices:["Add a Department?","Add a Role?","Add a Employee?"]
+    }]).then((answer)=>{
+        if (answer.option === "Add a Employee?") {
+            addEmployee();
+            }
+    })
+}
+//get information for adding employee
+function addEmployee(){
+    inquire.prompt([
+        {
+            name: "empFirst",
+            type: "input",
+            message: "What is your First Name?"
+        },
+        {
+            name: "empLast",
+            type: "input",
+            message: "What is your Last Name?"
+        },
+        {
+            name: "empRole",
+            type: "input",
+            message: "What is your Role ID?"
+        },
+        {
+            name: "managerID",
+            type: "input",
+            message: "What is your Manager's ID?",
+            validate: function(value) {
+                if (isNaN(value) === false) {
+                  return true;
+                  
+                }
+                return false;
+              }
+        }
+    ])
+    .then(function(answer){
+    connection.query (
+        "INSERT INTO EMPLOYEE(FIRST_NAME,LAST_NAME,ROLE_ID,MANAGER_ID)VALUES (?)",
+        {
+            FIRST_NAME: answer.empFirst,
+            LAST_NAME: answer.empLast,
+            ROLE_ID: parseInt(answer.empRole) || 0,
+            MANAGER_ID: parseInt(answer.managerID) || 0
+        },
+        function (err){
+            if (err) throw err;
+            console.log("Employee added");
+          
+            
+        }
+    );
+    });
+}
+/*results.forEach((EMPLOYEE,index)=>{
+    console.log(`ID: ${EMPLOYEE.ID} : ${EMPLOYEE.FIRST_NAME}, ${EMPLOYEE.LAST_NAME}| ${EMPLOYEE.ROLE_ID} |${EMPLOYEE.MANAGER_ID}`);
+})*/
